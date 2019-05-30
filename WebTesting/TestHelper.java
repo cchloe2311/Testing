@@ -1,9 +1,6 @@
 import org.junit.After;
 import org.junit.Before;
-import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -35,7 +32,6 @@ public class TestHelper {
 
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
         driver.get(baseUrl);
-
     }
 
     void goToPage(String page){
@@ -170,6 +166,35 @@ public class TestHelper {
 
                 break;
             }
+        }
+    }
+
+    void addAProductToCart(String title) {
+        // B45593 Sunglasses_entry
+        // Sunglasses B45593_entry
+
+        // //*[@id="Sunglasses B45593_entry"]
+        WebElement div = driver.findElement(By.id(title));
+
+        // //*[@id="B45593 Sunglasses_entry"]/div[2]/form/input[1]
+        div.findElement(By.xpath("./div[2]/form/input[1]")).click();
+    }
+
+    void addToCart() {
+        addAProductToCart("B45593 Sunglasses_entry");
+        addAProductToCart("Sunglasses B45593_entry");
+    }
+
+    int getNumofRowInCart() {
+        List<WebElement> cartRows = driver.findElements(By.xpath(("//*[@id=\"cart\"]/table//tr")));
+        return cartRows.size();
+    }
+
+    void emptyCart() {
+        try {
+            driver.findElement(By.xpath("//input[@value='Empty cart']")).click();
+        } catch(StaleElementReferenceException e) {
+            driver.findElement(By.xpath("//input[@value='Empty cart']")).click();
         }
     }
 

@@ -3,6 +3,8 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 
+import java.util.List;
+
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -111,7 +113,7 @@ public class BasicTest extends TestHelper {
         logout();
     }
 
-    @Test
+    //@Test
     public void editProductTest() {
         login(username, password);
 
@@ -120,6 +122,28 @@ public class BasicTest extends TestHelper {
         assertEquals("Type: " + productTypeEdit, type.getText());
 
         logout();
+    }
+
+    //@Test
+    public void addToCartTest() {
+        addToCart();
+
+        int postNumOfRow = getNumofRowInCart();
+
+        assertEquals( 2, postNumOfRow);
+    }
+
+    @Test
+    public void emptyCartTest() {
+        addToCart();
+        emptyCart();
+
+        try{
+            WebElement cartTitle = driver.findElement(By.id("cart_title"));
+            assertFalse(true);
+        } catch(NoSuchElementException e) {
+            assertTrue(true);
+        }
     }
 
 }
