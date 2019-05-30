@@ -22,6 +22,9 @@ public class BasicTest extends TestHelper {
     private String productType = "Other";
     private String productPrice = "200";
 
+    private String productTitleEdit = "Galaxy buds";
+    private String productTypeEdit = "Sunglasses";
+
     //@Test
     public void titleExistsTest(){
         String expectedTitle = "ST Online Store";
@@ -94,12 +97,27 @@ public class BasicTest extends TestHelper {
 
     }
 
-    @Test
-    public void addProductTest() {
+    //@Test
+    public void addRemoveProductTest() {
         login(username, password);
 
         addProduct(productTitle, productDescription, productType, productPrice);
         assertTrue(isProductAdded(productTitle));
+
+        removeProduct(productTitle);
+        WebElement notice = driver.findElement(By.id("notice"));
+        assertEquals("Product was successfully destroyed.",notice.getText());
+
+        logout();
+    }
+
+    @Test
+    public void editProductTest() {
+        login(username, password);
+
+        editProduct(productTitleEdit, productTypeEdit);
+        WebElement type = driver.findElement(By.xpath("//*[@id=\"main\"]/div/p[4]"));
+        assertEquals("Type: " + productTypeEdit, type.getText());
 
         logout();
     }

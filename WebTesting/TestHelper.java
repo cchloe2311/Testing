@@ -138,14 +138,39 @@ public class TestHelper {
          return false;
     }
 
-    // TODO
-    void deleteProduct(String title) {
+    void removeProduct(String title) {
+        List<WebElement> productRows = driver.findElements(By.xpath(("//*[@id=\"main\"]/div/table//tr")));
+        productRows.remove(0);
 
+        for (WebElement row: productRows) {
+            // //*[@id="B45593 Sunglasses"]/td[2]/a
+            if (row.findElement(By.xpath("./td[2]/a")).getText().equals(title)) {
+                // //*[@id="Airpod"]/td[4]/a
+                row.findElement(By.xpath("./td[4]/a")).click();
+                break;
+            }
+        }
     }
 
-    // TODO
-    void isProductDeleted(String title) {
+    void editProduct(String title, String type) {
+        waitForElementById("Products");
 
+        List<WebElement> productRows = driver.findElements(By.xpath(("//*[@id=\"main\"]/div/table//tr")));
+        productRows.remove(0);
+
+        for (WebElement row: productRows) {
+            if (row.findElement(By.xpath("./td[2]/a")).getText().equals(title)) {
+                row.findElement(By.xpath("./td[3]/a")).click();
+                waitForElementById("product_title");
+
+                Select select = new Select(driver.findElement(By.id("product_prod_type")));
+                select.selectByVisibleText(type);
+
+                driver.findElement(By.xpath("//input[@value='Update Product']")).click();
+
+                break;
+            }
+        }
     }
 
     @After
