@@ -133,7 +133,7 @@ public class BasicTest extends TestHelper {
         assertEquals( 2, postNumOfRow);
     }
 
-    @Test
+    //@Test
     public void emptyCartTest() {
         addToCart();
         emptyCart();
@@ -144,6 +144,21 @@ public class BasicTest extends TestHelper {
         } catch(NoSuchElementException e) {
             assertTrue(true);
         }
+    }
+
+    //@Test
+    public void removeAProduct() {
+        addToCart();
+        removeAProductFromCart("B45593 Sunglasses");
+
+        // waitForElementById를 쓸 수 없어서 이렇게 구현했습니다.
+        while(true) {
+            int postNumOfRow = getNumofRowInCart();
+            if ((3 - 1) == postNumOfRow) break;
+        }
+
+        WebElement notice = driver.findElement(By.id("notice"));
+        assertEquals("Item successfully deleted from cart.",notice.getText());
     }
 
 }

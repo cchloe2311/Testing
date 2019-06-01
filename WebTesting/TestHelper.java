@@ -198,6 +198,41 @@ public class TestHelper {
         }
     }
 
+    void removeAProductFromCart(String title) {
+        List<WebElement> cartRows = driver.findElements(By.xpath(("//*[@id=\"cart\"]/table//tr")));
+
+        for (WebElement row: cartRows) {
+            boolean isMatch = false;
+            int attempts = 0;
+
+            while(attempts < 2) {
+                try{
+                    isMatch = row.findElement(By.xpath("./td[2]")).getText().equals(title);
+                    attempts = 0;
+                    break;
+                } catch(StaleElementReferenceException e) {
+                }
+
+                attempts++;
+            }
+
+            if (isMatch) {
+                while(attempts < 2) {
+                    try{
+                        row.findElement(By.xpath("./td[6]/a")).click();
+                        attempts = 0;
+                        break;
+                    } catch(StaleElementReferenceException e) {
+                    }
+
+                    attempts++;
+                }
+                break;
+            }
+        }
+
+    }
+
     @After
     public void tearDown(){
         driver.close();
