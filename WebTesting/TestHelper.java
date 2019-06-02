@@ -198,6 +198,29 @@ public class TestHelper {
         }
     }
 
+    public WebElement getRow(String title) {
+        List<WebElement> cartRows = driver.findElements(By.xpath(("//*[@id=\"cart\"]/table//tr")));
+
+        for (WebElement row: cartRows) {
+            boolean isMatch = false;
+            int attempts = 0;
+
+            while (attempts < 2) {
+                try {
+                    isMatch = row.findElement(By.xpath("./td[2]")).getText().equals(title);
+                    attempts = 0;
+                    break;
+                } catch (StaleElementReferenceException e) {
+                }
+
+                attempts++;
+            }
+
+            if (isMatch) return row;
+        }
+        return null;
+    }
+
     void removeAProductFromCart(String title) {
         List<WebElement> cartRows = driver.findElements(By.xpath(("//*[@id=\"cart\"]/table//tr")));
 
@@ -231,6 +254,113 @@ public class TestHelper {
             }
         }
 
+    }
+
+    public void increaseQuantity(String title) {
+        List<WebElement> cartRows = driver.findElements(By.xpath(("//*[@id=\"cart\"]/table//tr")));
+
+        for (WebElement row: cartRows) {
+            boolean isMatch = false;
+            int attempts = 0;
+
+            while(attempts < 2) {
+                try{
+                    isMatch = row.findElement(By.xpath("./td[2]")).getText().equals(title);
+                    attempts = 0;
+                    break;
+                } catch(StaleElementReferenceException e) {
+                }
+
+                attempts++;
+            }
+
+            if (isMatch) {
+                while(attempts < 20) {
+                    try{
+                        // row.findElement(By.xpath("./td[6]/a")).click();
+                        // //*[@id="cart"]/table/tbody/tr[1]/td[5]/a
+                        row.findElement(By.xpath("./td[5]/a")).click();
+                        attempts = 0;
+                        break;
+                    } catch(StaleElementReferenceException e) {
+                    }
+
+                    attempts++;
+                }
+                break;
+            }
+        }
+    }
+
+    public void decreaseQuantity(String title) {
+        List<WebElement> cartRows = driver.findElements(By.xpath(("//*[@id=\"cart\"]/table//tr")));
+
+        for (WebElement row: cartRows) {
+            boolean isMatch = false;
+            int attempts = 0;
+
+            while(attempts < 2) {
+                try{
+                    isMatch = row.findElement(By.xpath("./td[2]")).getText().equals(title);
+                    attempts = 0;
+                    break;
+                } catch(StaleElementReferenceException e) {
+                }
+
+                attempts++;
+            }
+
+            if (isMatch) {
+                while(attempts < 20) {
+                    try{
+                        // row.findElement(By.xpath("./td[6]/a")).click();
+                        // //*[@id="cart"]/table/tbody/tr[1]/td[5]/a
+                        row.findElement(By.xpath("./td[4]/a")).click();
+                        attempts = 0;
+                        break;
+                    } catch(StaleElementReferenceException e) {
+                    }
+
+                    attempts++;
+                }
+                break;
+            }
+        }
+    }
+
+    public boolean waitForIncDec(String title, int preQuantity, int isInd) {
+        List<WebElement> cartRows = driver.findElements(By.xpath(("//*[@id=\"cart\"]/table//tr")));
+
+        for (WebElement row: cartRows) {
+            int attempts = 0;
+            boolean isMatch = false;
+
+            while(attempts < 2) {
+                try{
+                    isMatch = row.findElement(By.xpath("./td[2]")).getText().equals(title);
+                    attempts = 0;
+                    break;
+                } catch(StaleElementReferenceException e) {
+                }
+
+                attempts++;
+            }
+
+            if (isMatch) {
+                while(attempts < 2) {
+                    try{
+                        if (row.findElement(By.xpath("./td[1]")).getText().equals(Integer.toString(preQuantity + isInd) + "×")) return true;
+                        else return false;
+                    } catch(StaleElementReferenceException e) {
+                    }
+
+                    attempts++;
+                }
+                break;
+            }
+        }
+
+        return false;
     }
 
     @After

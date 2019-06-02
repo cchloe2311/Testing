@@ -27,6 +27,8 @@ public class BasicTest extends TestHelper {
     private String productTitleEdit = "Galaxy buds";
     private String productTypeEdit = "Sunglasses";
 
+    private String theProductTitle = "B45593 Sunglasses";
+
     //@Test
     public void titleExistsTest(){
         String expectedTitle = "ST Online Store";
@@ -147,9 +149,9 @@ public class BasicTest extends TestHelper {
     }
 
     //@Test
-    public void removeAProduct() {
+    public void removeAProductTest() {
         addToCart();
-        removeAProductFromCart("B45593 Sunglasses");
+        removeAProductFromCart(theProductTitle);
 
         // waitForElementById를 쓸 수 없어서 이렇게 구현했습니다.
         while(true) {
@@ -161,4 +163,15 @@ public class BasicTest extends TestHelper {
         assertEquals("Item successfully deleted from cart.",notice.getText());
     }
 
+    //@Test
+    public void incDecInQuantityTest() {
+        addToCart();
+        increaseQuantity(theProductTitle);
+
+        assertTrue(waitForIncDec(theProductTitle, 1, +1));
+
+        decreaseQuantity(theProductTitle);
+        assertTrue(waitForIncDec(theProductTitle, 1, -1));
+
+    }
 }
