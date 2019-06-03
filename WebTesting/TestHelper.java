@@ -7,6 +7,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -117,7 +118,6 @@ public class TestHelper {
         driver.findElement(By.id("product_price")).sendKeys(price);
 
         driver.findElement(By.xpath("//input[@value='Create Product']")).click();
-        waitForElementById("new_product_div");
     }
 
     boolean isProductAdded(String title) {
@@ -169,28 +169,24 @@ public class TestHelper {
         }
     }
 
-    void addAProductToCart(String title) {
-        // B45593 Sunglasses_entry
-        // Sunglasses B45593_entry
-
-        // //*[@id="Sunglasses B45593_entry"]
+    public void addAProductToCart(String title) {
         WebElement div = driver.findElement(By.id(title));
 
         // //*[@id="B45593 Sunglasses_entry"]/div[2]/form/input[1]
         div.findElement(By.xpath("./div[2]/form/input[1]")).click();
     }
 
-    void addToCart() {
+    public void addToCart() {
         addAProductToCart("B45593 Sunglasses_entry");
         addAProductToCart("Sunglasses B45593_entry");
     }
 
-    int getNumofRowInCart() {
+    public int getNumofRowInCart() {
         List<WebElement> cartRows = driver.findElements(By.xpath(("//*[@id=\"cart\"]/table//tr")));
         return cartRows.size();
     }
 
-    void emptyCart() {
+    public void emptyCart() {
         try {
             driver.findElement(By.xpath("//input[@value='Empty cart']")).click();
         } catch(StaleElementReferenceException e) {
@@ -198,7 +194,7 @@ public class TestHelper {
         }
     }
 
-    public WebElement getRow(String title) {
+    public WebElement getRow(String title) throws InterruptedException {
         List<WebElement> cartRows = driver.findElements(By.xpath(("//*[@id=\"cart\"]/table//tr")));
 
         for (WebElement row: cartRows) {
@@ -211,6 +207,7 @@ public class TestHelper {
                     attempts = 0;
                     break;
                 } catch (StaleElementReferenceException e) {
+                    Thread.sleep(1000);
                 }
 
                 attempts++;
@@ -221,7 +218,7 @@ public class TestHelper {
         return null;
     }
 
-    void removeAProductFromCart(String title) {
+    public void removeAProductFromCart(String title) throws InterruptedException {
         List<WebElement> cartRows = driver.findElements(By.xpath(("//*[@id=\"cart\"]/table//tr")));
 
         for (WebElement row: cartRows) {
@@ -234,6 +231,7 @@ public class TestHelper {
                     attempts = 0;
                     break;
                 } catch(StaleElementReferenceException e) {
+                    Thread.sleep(1000);
                 }
 
                 attempts++;
@@ -246,6 +244,7 @@ public class TestHelper {
                         attempts = 0;
                         break;
                     } catch(StaleElementReferenceException e) {
+                        Thread.sleep(1000);
                     }
 
                     attempts++;
@@ -253,10 +252,9 @@ public class TestHelper {
                 break;
             }
         }
-
     }
 
-    public void increaseQuantity(String title) {
+    public void changeQuantity(String title, int index) throws InterruptedException {
         List<WebElement> cartRows = driver.findElements(By.xpath(("//*[@id=\"cart\"]/table//tr")));
 
         for (WebElement row: cartRows) {
@@ -269,78 +267,7 @@ public class TestHelper {
                     attempts = 0;
                     break;
                 } catch(StaleElementReferenceException e) {
-                }
-
-                attempts++;
-            }
-
-            if (isMatch) {
-                while(attempts < 20) {
-                    try{
-                        // row.findElement(By.xpath("./td[6]/a")).click();
-                        // //*[@id="cart"]/table/tbody/tr[1]/td[5]/a
-                        row.findElement(By.xpath("./td[5]/a")).click();
-                        attempts = 0;
-                        break;
-                    } catch(StaleElementReferenceException e) {
-                    }
-
-                    attempts++;
-                }
-                break;
-            }
-        }
-    }
-
-    public void decreaseQuantity(String title) {
-        List<WebElement> cartRows = driver.findElements(By.xpath(("//*[@id=\"cart\"]/table//tr")));
-
-        for (WebElement row: cartRows) {
-            boolean isMatch = false;
-            int attempts = 0;
-
-            while(attempts < 2) {
-                try{
-                    isMatch = row.findElement(By.xpath("./td[2]")).getText().equals(title);
-                    attempts = 0;
-                    break;
-                } catch(StaleElementReferenceException e) {
-                }
-
-                attempts++;
-            }
-
-            if (isMatch) {
-                while(attempts < 20) {
-                    try{
-                        // row.findElement(By.xpath("./td[6]/a")).click();
-                        // //*[@id="cart"]/table/tbody/tr[1]/td[5]/a
-                        row.findElement(By.xpath("./td[4]/a")).click();
-                        attempts = 0;
-                        break;
-                    } catch(StaleElementReferenceException e) {
-                    }
-
-                    attempts++;
-                }
-                break;
-            }
-        }
-    }
-
-    public boolean waitForIncDec(String title, int preQuantity, int isInd) {
-        List<WebElement> cartRows = driver.findElements(By.xpath(("//*[@id=\"cart\"]/table//tr")));
-
-        for (WebElement row: cartRows) {
-            int attempts = 0;
-            boolean isMatch = false;
-
-            while(attempts < 2) {
-                try{
-                    isMatch = row.findElement(By.xpath("./td[2]")).getText().equals(title);
-                    attempts = 0;
-                    break;
-                } catch(StaleElementReferenceException e) {
+                    Thread.sleep(1000);
                 }
 
                 attempts++;
@@ -349,9 +276,51 @@ public class TestHelper {
             if (isMatch) {
                 while(attempts < 2) {
                     try{
-                        if (row.findElement(By.xpath("./td[1]")).getText().equals(Integer.toString(preQuantity + isInd) + "×")) return true;
+                         //*[@id="cart"]/table/tbody/tr[1]/td[5]/a
+                        List<WebElement> quantities = row.findElements(By.className("quantity"));
+
+                        quantities.get(index).click();
+                        Thread.sleep(2000);
+
+                        attempts = 0;
+                        break;
+                    } catch(StaleElementReferenceException e) {
+                        Thread.sleep(1000);
+                    }
+
+                    attempts++;
+                }
+                break;
+            }
+        }
+    }
+
+    public boolean isQuantityChanged(String title, int preQuantity, int flag) throws InterruptedException {
+        List<WebElement> cartRows = driver.findElements(By.xpath(("//*[@id=\"cart\"]/table//tr")));
+
+        for (WebElement row: cartRows) {
+            int attempts = 0;
+            boolean isMatch = false;
+
+            while(attempts < 2) {
+                try{
+                    isMatch = row.findElement(By.xpath("./td[2]")).getText().equals(title);
+                    attempts = 0;
+                    break;
+                } catch(StaleElementReferenceException e) {
+                    Thread.sleep(1000);
+                }
+
+                attempts++;
+            }
+
+            if (isMatch) {
+                while(attempts < 2) {
+                    try{
+                        if (row.findElement(By.xpath("./td[1]")).getText().equals(Integer.toString(preQuantity + flag) + "×")) return true;
                         else return false;
                     } catch(StaleElementReferenceException e) {
+                        Thread.sleep(1000);
                     }
 
                     attempts++;
@@ -361,6 +330,119 @@ public class TestHelper {
         }
 
         return false;
+    }
+
+    public WebElement getProduct(String title) {
+        List<WebElement> products = driver.findElements(By.className("entry"));
+        List<WebElement> match = new ArrayList<WebElement>();
+
+        for (WebElement product: products) {
+            boolean isMatch = false;
+            int attempts = 0;
+
+            while (attempts < 2) {
+                try {
+                    // //*[@id="44_entry"]/h3/a
+                    isMatch = product.findElement(By.xpath("./h3/a")).getText().equals(title);
+                    attempts = 0;
+                    break;
+                } catch (StaleElementReferenceException e) {
+                }
+
+                attempts++;
+            }
+
+            if (isMatch) {
+
+            }
+        }
+        return null;
+    }
+
+    public void searchByTitle(String title) {
+        driver.findElement(By.id("search_input")).sendKeys(title);
+    }
+
+    public boolean isSearchByTitleWorks(String title) {
+        List<WebElement> products = driver.findElements(By.className("entry"));
+
+        for (WebElement product: products) {
+            boolean isMatch = false;
+            int attempts = 0;
+
+            while (attempts < 2) {
+                try {
+                    // //*[@id="44_entry"]/h3/a
+                    isMatch = product.findElement(By.xpath("./h3/a")).getText().equals(title);
+                    attempts = 0;
+                    break;
+                } catch (StaleElementReferenceException e) {
+                }
+
+                attempts++;
+            }
+
+            if (!isMatch && product.isDisplayed()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public void filterByCategory(String category) {
+        driver.findElement(By.linkText(category)).click();
+    }
+
+    public boolean isFilterByCategoryWorks(String category) {
+        List<WebElement> products = driver.findElements(By.className("entry"));
+
+        for (WebElement product: products) {
+            boolean isContain = false;
+            int attempts = 0;
+
+            while (attempts < 2) {
+                try {
+                    // //*[@id="category"]/text()
+                    isContain = product.findElement(By.id("category")).getText().contains(category);
+                    attempts = 0;
+                    break;
+                } catch (StaleElementReferenceException e) {
+                }
+
+                attempts++;
+            }
+
+            if (!isContain) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public void payProducts() {
+        try {
+            driver.findElement(By.xpath("//input[@value='Checkout']")).click();
+        } catch(StaleElementReferenceException e) {
+            driver.findElement(By.xpath("//input[@value='Checkout']")).click();
+        }
+
+        waitForElementById("order_page");
+
+        driver.findElement(By.id("order_name")).sendKeys("chloe");
+        driver.findElement(By.id("order_address")).sendKeys("Chungmuro, Jung-gu, Seoul, Korea");
+        driver.findElement(By.id("order_email")).sendKeys("cchloe2311@daum.net");
+        Select select = new Select(driver.findElement(By.id("order_pay_type")));
+        select.selectByVisibleText("Check");
+
+        try {
+            driver.findElement(By.xpath("//input[@value='Place Order']")).click();
+        } catch(StaleElementReferenceException e) {
+            driver.findElement(By.xpath("//input[@value='Place Order']")).click();
+        }
+
+        waitForElementById("order_receipt");
     }
 
     @After

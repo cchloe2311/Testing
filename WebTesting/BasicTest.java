@@ -3,8 +3,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 
-import java.util.List;
-
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -21,13 +19,17 @@ public class BasicTest extends TestHelper {
 
     private String productTitle = "Airpod";
     private String productDescription = "You should buy it";
-    private String productType = "Other";
+    private String productCategory = "Other";
     private String productPrice = "200";
 
     private String productTitleEdit = "Galaxy buds";
     private String productTypeEdit = "Sunglasses";
 
     private String theProductTitle = "B45593 Sunglasses";
+
+    private String[] categories = {"Sunglasses", "Books", "Other"};
+
+    private String totalAmount = "€104.00";
 
     //@Test
     public void titleExistsTest(){
@@ -105,7 +107,8 @@ public class BasicTest extends TestHelper {
     public void addRemoveProductTest() {
         login(username, password);
 
-        addProduct(productTitle, productDescription, productType, productPrice);
+        addProduct(productTitle, productDescription, productCategory, productPrice);
+        waitForElementById("new_product_div");
         assertTrue(isProductAdded(productTitle));
 
         removeProduct(productTitle);
@@ -113,6 +116,16 @@ public class BasicTest extends TestHelper {
         assertEquals("Product was successfully destroyed.",notice.getText());
 
         logout();
+    }
+
+    @Test
+    public void addProductFailureTest() {
+        login(username, password);
+
+        addProduct(productTitleEdit, productDescription, productCategory, productPrice);
+        waitForElementById("error_explanation");
+
+        assertEquals("Title has already been taken", driver.findElement(By.xpath("//*[@id=\"error_explanation\"]/ul/li")).getText());
     }
 
     //@Test
@@ -148,8 +161,8 @@ public class BasicTest extends TestHelper {
         }
     }
 
-    //@Test
-    public void removeAProductTest() {
+    //@Test@
+    public void removeAProductTest() throws InterruptedException {
         addToCart();
         removeAProductFromCart(theProductTitle);
 
@@ -164,14 +177,57 @@ public class BasicTest extends TestHelper {
     }
 
     //@Test
-    public void incDecInQuantityTest() {
+    public void incDecInQuantityTest() throws InterruptedException {
         addToCart();
-        increaseQuantity(theProductTitle);
 
-        assertTrue(waitForIncDec(theProductTitle, 1, +1));
+        final int INC = 1;
+        final int DEC = 2;
 
-        decreaseQuantity(theProductTitle);
-        assertTrue(waitForIncDec(theProductTitle, 1, -1));
+        changeQuantity(theProductTitle, INC);
+        assertTrue(isQuantityChanged(theProductTitle, 1, +1));
 
+        changeQuantity(theProductTitle, DEC);
+        assertTrue(isQuantityChanged(theProductTitle, 1, -1));
+    }
+
+    //@Test
+    public void searchByTitleTest() {
+        searchByTitle(theProductTitle);
+        assertTrue(isSearchByTitleWorks(theProductTitle));
+    }
+
+    //@Test
+    public void searchByTitleFailureTest() {
+        searchByTitle("someThingNowExist");
+        assertTrue(isSearchByTitleWorks("someThingNowExist"));
+    }
+
+    //@Test
+    public void payProductsTest() {
+        // 같은 물품을 여러 개 추가하기 위해 addToCart 메소드를 두번 호출
+        addToCart();
+        addToCart();
+
+        payProducts();
+
+        assertEquals(totalAmount, driver.findElement(By.xpath("//*[@id=\"check_out\"]/tbody/tr[3]/td[2]/strong")).getText());
+    }
+
+    //@Test
+    public void payProductFailureTest() {
+        try {
+            payProducts();
+            assertFalse(true);
+        } catch(NoSuchElementException e) {
+            assertTrue(true);
+        }
+    }
+
+    //@Test
+    public void filterByCategoryTest() {
+        for(String category: categories) {
+            filterByCategory(category);
+            assertTrue(isFilterByCategoryWorks(category));
+        }
     }
 }
